@@ -24,6 +24,40 @@ public struct Notification: Identifiable {
     public var attachment: String?
     /// Notification attachment identifier
     public var attachmentIdentifier: String?
+    
+    public init(
+        title: String,
+        body: String,
+        subTitle: String,
+        badge: NSNumber,
+        userInfo: [String: String],
+        categoryIdentifier: String) {
+        self.title = title
+        self.body = body
+        self.subTitle = subTitle
+        self.badge = badge
+        self.userInfo = userInfo
+        self.categoryIdentifier = categoryIdentifier
+    }
+    
+    public init(
+        title: String,
+        body: String,
+        subTitle: String,
+        badge: NSNumber,
+        userInfo: [String: String],
+        categoryIdentifier: String,
+        attachment: String,
+        attachmentIdentifier: String) {
+        self.title = title
+        self.body = body
+        self.subTitle = subTitle
+        self.badge = badge
+        self.userInfo = userInfo
+        self.categoryIdentifier = categoryIdentifier
+        self.attachment = attachment
+        self.attachmentIdentifier = attachmentIdentifier
+    }
 }
 
 /**
@@ -31,6 +65,8 @@ public struct Notification: Identifiable {
  */
 @available(iOS 10.0, *)
 public struct LocalNotificationManager {
+    public init() {}
+    
     private var notifications = [Notification]()
 
     /**
