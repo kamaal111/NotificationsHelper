@@ -47,8 +47,8 @@ public struct Notification: Identifiable {
         badge: NSNumber,
         userInfo: [String: String],
         categoryIdentifier: String,
-        attachment: String,
-        attachmentIdentifier: String) {
+        attachment: String?,
+        attachmentIdentifier: String?) {
         self.title = title
         self.body = body
         self.subTitle = subTitle
