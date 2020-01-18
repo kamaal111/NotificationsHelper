@@ -9,21 +9,21 @@ public struct Notification: Identifiable {
     /// Identifiable id
     public let id = UUID()
     /// Notification title
-    var title: String
+    public var title: String
     /// Notification body
-    var body: String
+    public var body: String
     /// Notification sub title
-    var subTitle: String
+    public var subTitle: String
     /// Notification badge count
-    var badge: NSNumber
+    public var badge: NSNumber
     /// Notification meta data
-    var userInfo: [String: String]
+    public var userInfo: [String: String]
     /// Notification category identifier
-    var categoryIdentifier: String
+    public var categoryIdentifier: String
     /// Notification attachment path
-    var attachment: String?
+    public var attachment: String?
     /// Notification attachment identifier
-    var attachmentIdentifier: String?
+    public var attachmentIdentifier: String?
 }
 
 /**
@@ -37,7 +37,7 @@ public struct LocalNotificationManager {
      * This function checks if user has granted permission to get notifications
      * - Returns: `void`
      */
-    func requestPermission() {
+    public func requestPermission() {
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(
             options: [.alert, .sound, .badge],
@@ -57,7 +57,7 @@ public struct LocalNotificationManager {
      *      - notification: provide a `Notification` type to *notification*
      * - Returns: `void`
      */
-    mutating func addNotification(notification: Notification) {
+    public mutating func addNotification(notification: Notification) {
         notifications.append(notification)
     }
 
@@ -68,7 +68,7 @@ public struct LocalNotificationManager {
      *      - timeInterval: *timeInterval* to schedule notification
      * - Returns: `void`
      */
-    func scheduleNotifications(timeInterval: Double, repeats: Bool) {
+    public func scheduleNotifications(timeInterval: Double, repeats: Bool) {
         let notificationCenter = UNUserNotificationCenter.current()
 
         notificationCenter.getNotificationSettings(completionHandler: {(settings) in
