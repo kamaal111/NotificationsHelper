@@ -1,82 +1,64 @@
 import UserNotifications
 
-struct NotificationsHelper {
-    var text = "Hello, World!"
+/// This protocol gives guidlines to create a notification.
+@available(tvOS, unavailable)
+public protocol Notifiable {
+    
+    /// Identifiable id.
+    var id: UUID { get }
+    
+    /// Notification titel.
+    var title: String { get set }
+    
+    /// Notification body.
+    var body: String { get set }
+    
+    /// Notification subtitle.
+    var subtitle: String { get set }
+    
+    /// Notification badge count.
+    var badge: NSNumber { get set }
+    
+    /// Notification sound.
+    @available(OSX 10.14, watchOS 3.0, *)
+    var sound: UNNotificationSound? { get set }
+    
+    /// Notification meta data.
+    var userInfo: [String: String] { get set }
+    
+    /// Notification category identifier.
+    var categoryIdentifier: String { get set }
+    
+    /// Notification attachment path.
+    var attachment: String? { get set }
+    
+    /// Notification attachment identifier.
+    var attachmentIdentifier: String? { get set }
 }
 
-/// This struct represents a notification
-public struct Notification: Identifiable {
-    /// Identifiable id
-    public let id = UUID()
-    /// Notification title
-    public var title: String
-    /// Notification body
-    public var body: String
-    /// Notification sub title
-    public var subTitle: String
-    /// Notification badge count
-    public var badge: NSNumber
-    /// Notification meta data
-    public var userInfo: [String: String]
-    /// Notification category identifier
-    public var categoryIdentifier: String
-    /// Notification attachment path
-    public var attachment: String?
-    /// Notification attachment identifier
-    public var attachmentIdentifier: String?
-    
-    public init(
-        title: String,
-        body: String,
-        subTitle: String,
-        badge: NSNumber,
-        userInfo: [String: String],
-        categoryIdentifier: String) {
-        self.title = title
-        self.body = body
-        self.subTitle = subTitle
-        self.badge = badge
-        self.userInfo = userInfo
-        self.categoryIdentifier = categoryIdentifier
-    }
-    
-    public init(
-        title: String,
-        body: String,
-        subTitle: String,
-        badge: NSNumber,
-        userInfo: [String: String],
-        categoryIdentifier: String,
-        attachment: String?,
-        attachmentIdentifier: String?) {
-        self.title = title
-        self.body = body
-        self.subTitle = subTitle
-        self.badge = badge
-        self.userInfo = userInfo
-        self.categoryIdentifier = categoryIdentifier
-        self.attachment = attachment
-        self.attachmentIdentifier = attachmentIdentifier
-    }
-}
 
-/**
- * A helper struct with all the methods you need to create a notification
- */
+/// A helper struct with all the methods you need to create a user notification.
 @available(iOS 10.0, OSX 10.14, tvOS 10.0, watchOS 3.0, *)
-public struct LocalNotificationManager {
+@available(tvOS, unavailable)
+public struct NotificationsHelper {
+    
     public init() {}
     
-    private var notifications = [Notification]()
-
-    /**
-     * This function checks if user has granted permission to get notifications
-     * - Returns: `void`
-     */
-    public func requestPermission() {
+    private var notifications = [Notifiable]()
+    
+    /// This function checks if user has granted permission to get notifications.
+    /// ~~~
+    /// // Usage
+    /// let notificationsHelper = NotificationsHelper()
+    /// notificationsHelper.requestPermission(for: [.alert, .sound, .badge])
+    /// ~~~
+    /// - Parameters:
+    ///     - authorization: provide `UNAuthorizationOptions`. By default it is `[]`.
+    /// - Returns: `void`
+    public func requestPermission(for authorization: UNAuthorizationOptions = []) {
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(
-            options: [.alert, .sound, .badge],
+            options: authorization,
             completionHandler: { (permissionGranted, error) in
                 guard let checkedError = error else {
                     if !permissionGranted { print("Notification permission denied")}
@@ -86,64 +68,62 @@ public struct LocalNotificationManager {
                 print("ERROR:::", checkedError.localizedDescription)
         })
     }
-
-    /**
-     * This function adds a notification to the initial notifications array
-     * - Parameters:
-     *      - notification: provide a `Notification` type to *notification*
-     * - Returns: `void`
-     */
-    public mutating func addNotification(notification: Notification) {
+    
+    
+    ///  This function adds a notification to the notifications array
+    ///  - Parameters:
+    ///       - notification: provide a `Notifiable` type to *notification*
+    ///  - Returns: `void`
+    public mutating func addNotification(_ notification: Notifiable) {
         notifications.append(notification)
     }
-
-    /**
-     * This function schedules a notification for a certain time interval
-     * - Precondition: Must add a notification to the notifications array
-     * - Parameters:
-     *      - timeInterval: *timeInterval* to schedule notification
-     * - Returns: `void`
-     */
+    
+    
+    /// This function schedules a notification for a certain time interval
+    /// - Precondition: Must add a notification to the notifications array
+    /// - Parameters:
+    ///      - timeInterval: *timeInterval* to schedule notification
+    ///      - repeats: if notification should repeat
+    /// Returns: `void`
     public func scheduleNotifications(timeInterval: Double, repeats: Bool) {
         let notificationCenter = UNUserNotificationCenter.current()
-
-        notificationCenter.getNotificationSettings(completionHandler: {(settings) in
-            if settings.authorizationStatus == .authorized {
-                for notification in self.notifications {
-                    let content = UNMutableNotificationContent()
-                    content.userInfo = notification.userInfo
-                    content.title = notification.title
-                    content.body = notification.body
-                    content.subtitle = notification.subTitle
-                    content.sound = UNNotificationSound.default
-                    content.categoryIdentifier = notification.categoryIdentifier
-                    content.badge = notification.badge
-
-                    if let attachment = notification.attachment,
-                        let attachmentIdentifier = notification.attachmentIdentifier {
-                        let url = URL(fileURLWithPath: attachment)
-                        do {
-                            let constructedAttachment = try UNNotificationAttachment(
-                                identifier: attachmentIdentifier,
-                                url: url, options: nil
-                            )
-                            content.attachments = [constructedAttachment]
-                        } catch {
-                            print("Couldn't attach attachment to notification")
-                        }
+        
+        notificationCenter.getNotificationSettings(completionHandler: {(settings: UNNotificationSettings) in
+            if settings.authorizationStatus != .authorized { return }
+            for notification in self.notifications {
+                let content = UNMutableNotificationContent()
+                content.userInfo = notification.userInfo
+                content.title = notification.title
+                content.body = notification.body
+                content.subtitle = notification.subtitle
+                content.sound = notification.sound
+                content.categoryIdentifier = notification.categoryIdentifier
+                content.badge = notification.badge
+                
+                if let attachment = notification.attachment,
+                    let attachmentIdentifier = notification.attachmentIdentifier {
+                    let url = URL(fileURLWithPath: attachment)
+                    do {
+                        let constructedAttachment = try UNNotificationAttachment(
+                            identifier: attachmentIdentifier,
+                            url: url, options: nil
+                        )
+                        content.attachments = [constructedAttachment]
+                    } catch {
+                        print("Couldn't attach attachment to notification")
                     }
-
-                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: repeats)
-                    let request = UNNotificationRequest(identifier: notification.id.uuidString, content: content, trigger: trigger)
-
-                    notificationCenter.add(request, withCompletionHandler: { (error) in
-                        if let error = error {
-                            print("ERROR:::", error.localizedDescription)
-                            return
-                        }
-                        print("Scheduling notification with id: \(notification.id)")
-                    })
                 }
+                
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: repeats)
+                let request = UNNotificationRequest(identifier: notification.id.uuidString, content: content, trigger: trigger)
+                
+                notificationCenter.add(request, withCompletionHandler: { (error: Error?) in
+                    if let error = error {
+                        print("ERROR:::", error.localizedDescription)
+                        return
+                    }
+                    print("Scheduling notification with id: \(notification.id)")
+                })
             }
         })
     }
