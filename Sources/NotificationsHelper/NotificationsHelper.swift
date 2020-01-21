@@ -63,7 +63,7 @@ public struct Notification: Identifiable {
 /**
  * A helper struct with all the methods you need to create a notification
  */
-@available(iOS 10.0, *)
+@available(iOS 10.0, OSX 10.14, tvOS 10.0, watchOS 3.0, *)
 public struct LocalNotificationManager {
     public init() {}
     
