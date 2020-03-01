@@ -7,6 +7,6 @@ final class NotificationsHelperTests: XCTestCase {
     }
 
     static var allTests = [
-        ("testExample", testExample),
+        ("testExample", testExample)
     ]
 }

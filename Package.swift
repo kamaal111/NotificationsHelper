@@ -9,7 +9,7 @@ let package = Package(
     products: [
         .library(
             name: "NotificationsHelper",
-            targets: ["NotificationsHelper"]),
+            targets: ["NotificationsHelper"])
     ],
     dependencies: [
     ],
@@ -19,6 +19,6 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "NotificationsHelperTests",
-            dependencies: ["NotificationsHelper"]),
+            dependencies: ["NotificationsHelper"])
     ]
 )
